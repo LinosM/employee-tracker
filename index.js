@@ -290,7 +290,9 @@ const addDept = () => {
     });
 };
 
+// Changes the role of an employee
 const updateEmployeeRole = () => {
+    // Displays list of current employees and their roles
     connection.query(`SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS Employee, role.title AS Role FROM employee LEFT JOIN role ON (role.id = employee.role_id) ORDER BY role.id`, (err, res) => {
         if (err) throw err;
         console.table(res);
@@ -318,6 +320,7 @@ const updateEmployeeRole = () => {
                             choices: () => res.map(res => res.title)
                         }
                     ]).then((role) => {
+                        // Assigns the new selected role for the employee
                         connection.query(`UPDATE employee SET role_id = (SELECT id FROM role WHERE title = "${role.role}") WHERE CONCAT(first_name, " ", last_name) = "${employee.name}"`, (err, res) => {
                         if (err) throw err;
 
@@ -331,7 +334,9 @@ const updateEmployeeRole = () => {
     });
 };
 
+// Assigns a new manager to an employee
 const updateEmployeeManager = () => {
+    // Initializing values for function
     var employeeID;
     var managerID;
 
@@ -346,7 +351,8 @@ const updateEmployeeManager = () => {
                 choices: () => res.map(res => res.name)
             }
         ]).then((employee) => {
-            connection.query(`SELECT CONCAT(first_name, " ", last_name) as manager FROM employee WHERE (SELECT id FROM employee WHERE CONCAT(first_name, " ", last_name) = "${employee.name}") != employee.id;`, (err, res) => {
+            // Shows list of employees not including the one previously selected
+            connection.query(`SELECT CONCAT(first_name, " ", last_name) AS manager FROM employee WHERE (SELECT id FROM employee WHERE CONCAT(first_name, " ", last_name) = "${employee.name}") != employee.id;`, (err, res) => {
                 if (err) throw err;
 
                 inquirer.prompt([
@@ -357,12 +363,14 @@ const updateEmployeeManager = () => {
                         choices: () => res.map(res => res.manager)
                     }
                 ]).then((manager) => {
+                    // Grabs ID for both the selected employee and manager and assigns them to variables
                     connection.query(`SELECT id FROM employee WHERE CONCAT(first_name, ' ', last_name) = '${employee.name}'; SELECT id FROM employee WHERE CONCAT(first_name, ' ', last_name) = '${manager.name}'`, (err, res) => {
                         if (err) throw err;
 
                         employeeID = JSON.parse(JSON.stringify(res))[0][0].id;
                         managerID = JSON.parse(JSON.stringify(res))[1][0].id;
 
+                        // Assigns the manager's ID into the employee's manager_id
                         connection.query(`UPDATE employee SET manager_id = '${managerID}' WHERE id = '${employeeID}'`, (err, res) => {
                             if (err) throw err;
         
@@ -376,8 +384,10 @@ const updateEmployeeManager = () => {
     });
 };
 
+// Selects an employee to delete from the database
 const delEmployee = () => {
-    connection.query("SELECT employee.id, employee.first_name AS 'First Name', employee.last_name AS 'Last Name', role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(manager.first_name, ' ', manager.last_name) AS Manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id", (err, res) => {
+    // Prints table of all employees and their info for reference 
+    connection.query("SELECT employee.id, CONCAT(employee.first_name, ' ', employee.last_name) AS Employee, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(manager.first_name, ' ', manager.last_name) AS Manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id", (err, res) => {
         if (err) throw err;
 
         console.log("\n");
@@ -388,7 +398,7 @@ const delEmployee = () => {
                 name: 'employee',
                 type: 'list',
                 message: 'Select employee to delete',
-                choices: () => res.map(res => `${res.id} ${res["First Name"]} ${res["Last Name"]}`)
+                choices: () => res.map(res => `${res.id} ${res['Employee']}`)
             }
         ]).then((x) => {
             connection.query(`DELETE FROM employee WHERE CONCAT(id, ' ', first_name, ' ', last_name) = "${x.employee}"`, (err, res) => {
@@ -400,6 +410,7 @@ const delEmployee = () => {
     });
 };
 
+// Selects a role to delete from the database
 const delRole = () => {
     connection.query('SELECT * FROM role', (err, res) => {
         if (err) throw err;
@@ -421,6 +432,7 @@ const delRole = () => {
     });
 };
 
+// Selects a department to delete from the database
 const delDept = () => {
     connection.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;
