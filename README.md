@@ -24,6 +24,7 @@ Such options include
 * [Usage](#usage)
 * [Preview](#preview)
 * [Demonstration](#demonstration)
+* [Technology Used](#tech)
 * [Questions](#questions)
 
 ## Installation
@@ -49,6 +50,15 @@ Select `--Exit Application` or press `Ctrl+C` at any time to stop the applicatio
 ## Demonstration
 
 [Video Link](https://www.youtube.com/watch?v=EbKZBWK-oDQ)
+
+<a name="tech">
+
+## Technology Used
+
+* JavaScript
+* NodeJS
+* MySQL
+* Inquirer
 
 ## Questions
 
